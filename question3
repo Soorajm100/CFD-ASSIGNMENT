@@ -1,0 +1,50 @@
+%2D Heat transfer
+
+clc;
+clear all;
+hx=0.002;       
+hy=0.002;       
+l=0.5;         
+b=1;           
+Nx=l/hx;        
+Ny=b/hy;       
+x=0:0.002:0.5;
+y=0:0.002:1;
+T=zeros(Nx+1,Ny+1); %intializing with Temperatures zero at all the points
+E=ones(Nx+1,Ny+1); %Errors
+iterations=0;
+for i=1:Nx+1 %Boundary condition at Vertical walls
+    T(1,i)=0;   
+end
+%Gauss seidel method
+while max(max(E))>=0.00001
+    for i=1:Nx+1
+        for j=1:Ny+1
+            Te(i,j)=T(i,j);
+        end
+    end
+    for i=2:Nx
+        for j=2:Ny
+            T(i,j)=(0.25)*(T(i,j-1)+T(i-1,j)+T(i+1,j)+T(i,j+1));
+        end
+        for i=1:Nx+1 % Boundary conditions at Horizontal walls
+            T(i,1)=T(i,2);
+            T(i,Ny+1)=T(i,Ny)+(100/40);
+        end
+        for j=1:Ny+1
+            T(1,j)=0;
+            T(Nx+1,j)=T(Nx,j);
+        end
+    end
+    E=abs(T-Te);
+    iterations=iterations+1;
+
+end
+%Plotting
+T=transpose(T);
+[X,Y]=meshgrid(x,y);
+contourf(X,Y,T);
+c=colorbar();
+c.Label.String = 'Temperature in Celsius';
+xlabel("Length of rod->");
+ylabel("Breadth of rod->");
