@@ -1,0 +1,63 @@
+
+clc;
+clear all;
+
+
+
+
+N = 10 ; 
+length=1;
+h=length/N;
+k=40; 
+q_dot=1e5; 
+Tg= zeros(N+1,1);
+Tg(1,1)=0;
+Tg(N+1,1)=100;
+E=ones(N-1,1); 
+Iterations=0;
+
+
+
+%Gauss Seidel Method
+while max(E)>=10^-6
+ for i=2:N
+  Xe_n(i,1)=Tg(i,1);
+  Tg(i,1)=0.5*(Tg(i-1,1)+Tg(i+1,1)+(h^2*q_dot/k));
+  E(i-1,1) =abs(Tg(i,1)-Xe_n(i,1));
+  Iterations=Iterations+1;
+ end
+end
+
+
+
+
+l(1,1)=0; l(N+1,1)=0; l(2:N,1)=1; %lower diagonal elements
+d(1,1)=1; d(N+1,1)=1; d(2:N,1)=-2; %diagonal elements
+u(1,1)=0; u(N+1,1)=0; u(2:N,1)=1; %upper diagonal elements
+b(1,1)=0; b(N+1,1)=10; b(2:N,1)=-h^2*q_dot/k;
+Tt(1,1)= 0; Tt(N+1,1)=100; %Boundary conditions
+%Making the lower diagonal elements zero
+for i=2:N+1
+ d(i,1)=d(i,1)-(l(i,1)/d(i-1,1))*u(i-1,1);
+ b(i,1)=b(i,1)-(l(i,1)/d(i-1,1))*b(i-1,1);
+ l(i,1)=0;
+end
+
+for i=10:-1:2
+ Tt(i,1)=(b(i,1)-u(i,1)*Tt(i+1,1))/d(i,1);
+end
+
+
+X=0:h:length;
+figure 
+plot(X,Tg,"b-o","linewidth",2);
+legend("Gauss seidel method");
+xlabel("Length of rod in m  --->")
+ylabel("Temperature in Celsius --->")
+title("Temperature distribution in 1D rod");
+figure 
+plot(X,Tt,"g--X","linewidth",1);
+legend("TDMA Method");
+xlabel("Length of rod in m --->");
+ylabel("Temperature in Celsius  --->")
+title("Temperature distribution in 1D rod");
